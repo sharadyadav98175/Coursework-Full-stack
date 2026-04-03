@@ -1,0 +1,152 @@
+body {
+    font-family: Arial, sans-serif;
+    background: #f4f6f9;
+    margin: 0;
+    color: #222;
+}
+
+.container {
+    max-width: 1100px;
+    margin: 30px auto;
+    background: #fff;
+    padding: 24px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+}
+
+h1, h2 {
+    margin-top: 0;
+}
+
+.topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+}
+
+.nav-links a,
+.actions a,
+a.link-btn {
+    text-decoration: none;
+    color: #0d6efd;
+    margin-right: 10px;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+form.inline {
+    display: inline;
+}
+
+.form-row {
+    margin-bottom: 14px;
+}
+
+label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 6px;
+}
+
+input[type="text"],
+input[type="password"],
+input[type="number"],
+textarea,
+select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+button,
+.btn {
+    display: inline-block;
+    padding: 10px 16px;
+    background: #0d6efd;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+button:hover,
+.btn:hover {
+    background: #0b5ed7;
+    text-decoration: none;
+}
+
+.btn-danger {
+    background: #dc3545;
+}
+
+.btn-danger:hover {
+    background: #bb2d3b;
+}
+
+.message {
+    padding: 10px;
+    margin-bottom: 15px;
+    border-radius: 4px;
+}
+
+.error {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+.success {
+    background: #d1e7dd;
+    color: #0f5132;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 18px;
+}
+
+table, th, td {
+    border: 1px solid #ccc;
+}
+
+th {
+    background: #212529;
+    color: #fff;
+    text-align: left;
+}
+
+th, td {
+    padding: 10px;
+    vertical-align: top;
+}
+
+.search-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 12px;
+}
+
+@media (max-width: 900px) {
+    .search-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 600px) {
+    .search-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.small {
+    font-size: 14px;
+    color: #555;
+}
