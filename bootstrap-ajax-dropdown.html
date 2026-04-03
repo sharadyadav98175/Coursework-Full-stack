@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Ajax + Bootstrap Dropdown (Improved)</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+  </head>
+
+  <body>
+    <div class="container mt-4">
+      <h1>Ajax and Bootstrap Demo</h1>
+
+      <div class="dropdown" id="myDropdown">
+        <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+          Load Books
+        </button>
+        <ul class="dropdown-menu" id="myList" style="min-width:250px;"></ul>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+      const dropdown = document.getElementById("myDropdown");
+
+      dropdown.addEventListener("show.bs.dropdown", () => {
+
+        const list = document.getElementById("myList");
+
+        // Show spinner while loading
+        list.innerHTML = `
+          <li class="px-3 py-2 text-center">
+            <div class="spinner-border" role="status"></div>
+          </li>
+        `;
+
+        // Fetch data
+        fetch("https://mi-linux.wlv.ac.uk/~2413835/ajax/ajax.php")
+          .then(response => response.json())
+          .then(data => {
+
+            list.innerHTML = ""; // Clear list
+
+            // If no books found
+            if (data.length === 0) {
+              list.innerHTML = `
+                <li class="dropdown-item text-muted">
+                  No books available.
+                </li>`;
+              return;
+            }
+
+            // Add each book to dropdown
+            data.forEach(book => {
+              const li = document.createElement("li");
+              const a = document.createElement("a");
+
+              a.textContent = book.book_name;  // safer than innerHTML
+              a.href = "#";
+              a.classList.add("dropdown-item");
+
+              li.appendChild(a);
+              list.appendChild(li);
+            });
+          })
+          .catch(error => {
+            // Display error inside dropdown
+            list.innerHTML = `
+              <li class="dropdown-item text-danger">
+                Error loading data.
+              </li>`;
+          });
+      });
+    </script>
+
+  </body>
+</html>
