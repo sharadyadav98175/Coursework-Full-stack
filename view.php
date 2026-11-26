@@ -1,49 +1,126 @@
-<?php
-declare(strict_types=1);
 
+<?php
 require_once __DIR__ . '/auth.php';
 require_once __DIR__ . '/db.php';
 
+// Protect page from unauthorised access
 requireAuth();
 
-$pdo = getPDO();
-$id = (int)($_GET['id'] ?? 0);
+$mysqli->set_charset("utf8mb4");
 
-if ($id <= 0) {
+// Validate book ID
+$id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
+
+if (!$id || $id <= 0) {
     header('Location: index.php');
     exit;
 }
 
-$stmt = $pdo->prepare('SELECT * FROM books WHERE id = :id');
-$stmt->execute([':id' => $id]);
-$book = $stmt->fetch();
+// Prepared statement to prevent SQL injection
+$stmt = $mysqli->prepare(
+    "SELECT id, title, author, genre, year, summary
+     FROM books
+     WHERE id = ?"
+);
 
-if (!$book) {
+$stmt->bind_param("i", $id);
+$stmt->execute();
+
+$stmt->bind_result(
+    $bookId,
+    $title,
+    $author,
+    $genre,
+    $year,
+    $summary
+);
+
+// Check whether the book exists
+if (!$stmt->fetch()) {
+    $stmt->close();
     header('Location: index.php');
     exit;
+}
+
+$stmt->close();
+
+// Prevent XSS attacks
+function e($value) {
+    return htmlspecialchars(
+        (string)$value,
+        ENT_QUOTES,
+        'UTF-8'
+    );
 }
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>View Book</title>
-    <link rel="stylesheet" href="style.css">
-</head>
-<body>
-<div class="container" style="max-width:800px;">
-    <h2><?php echo htmlspecialchars((string)$book['title']); ?></h2>
 
-    <p><strong>Author:</strong> <?php echo htmlspecialchars((string)$book['author']); ?></p>
-    <p><strong>Genre:</strong> <?php echo htmlspecialchars((string)$book['genre']); ?></p>
-    <p><strong>Year:</strong> <?php echo htmlspecialchars((string)$book['year']); ?></p>
-    <p><strong>Summary:</strong><br><?php echo nl2br(htmlspecialchars((string)($book['summary'] ?? ''))); ?></p>
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>View Book</title>
+
+    <link rel="stylesheet" href="style.css">
+
+</head>
+
+<body>
+
+<div class="container" style="max-width:800px;">
+
+    <h1>Book Details</h1>
+
+    <hr>
+
+    <h2><?= e($title) ?></h2>
 
     <p>
-        <a href="edit.php?id=<?php echo (int)$book['id']; ?>">Edit</a>
-        <a href="index.php">Back</a>
+        <strong>Book ID:</strong>
+        <?= e($bookId) ?>
     </p>
+
+    <p>
+        <strong>Author:</strong>
+        <?= e($author) ?>
+    </p>
+
+    <p>
+        <strong>Genre:</strong>
+        <?= e($genre) ?>
+    </p>
+
+    <p>
+        <strong>Publication Year:</strong>
+        <?= e($year) ?>
+    </p>
+
+    <p>
+        <strong>Summary:</strong>
+    </p>
+
+    <p>
+        <?= nl2br(e($summary ?? '')) ?>
+    </p>
+
+    <hr>
+
+    <a class="btn"
+       href="edit.php?id=<?= (int)$bookId ?>">
+        Edit Book
+    </a>
+
+    <a class="link-btn"
+       href="index.php">
+        Back to Library
+    </a>
+
 </div>
+
 </body>
 </html>
