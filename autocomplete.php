@@ -1,16 +1,46 @@
+
 <?php
-declare(strict_types=1);
-require_once __DIR__ . '/../inc/db.php';
+require_once __DIR__ . '/auth.php';
+
 header('Content-Type: application/json; charset=utf-8');
 
-$q = $_GET['q'] ?? '';
-$q = trim($q);
-if ($q === '') {
+if (!isLoggedIn()) {
+    http_response_code(401);
     echo json_encode([]);
     exit;
 }
-$pdo = getPDO();
-$stmt = $pdo->prepare('SELECT DISTINCT title FROM books WHERE title LIKE :q ORDER BY title LIMIT 10');
-$stmt->execute([':q' => $q . '%']);
-$rows = $stmt->fetchAll(PDO::FETCH_COLUMN);
-echo json_encode($rows);
+
+require_once __DIR__ . '/db.php';
+
+$mysqli->set_charset('utf8mb4');
+
+$q = $_GET['q'] ?? '';
+
+if (!is_string($q) || trim($q) === '') {
+    echo json_encode([]);
+    exit;
+}
+
+$search = trim($q) . '%';
+
+$stmt = $mysqli->prepare(
+    "SELECT DISTINCT title
+     FROM books
+     WHERE title LIKE ?
+     ORDER BY title
+     LIMIT 10"
+);
+
+$stmt->bind_param("s", $search);
+$stmt->execute();
+$stmt->bind_result($title);
+
+$books = [];
+
+while ($stmt->fetch()) {
+    $books[] = $title;
+}
+
+$stmt->close();
+
+echo json_encode($books);
